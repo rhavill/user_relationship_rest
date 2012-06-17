@@ -1,0 +1,137 @@
+<?php
+/**
+ * @file
+ * Link general user relationship functionalities to services module.
+ *
+ * @author Drupal 6 port by Darren Ferguson <http://drupal.org/user/70179>
+ * @author Written by scottgifford http://drupal.org/user/245699 
+ */
+
+/**
+ * Implements hook_help().
+ */
+function user_relationship_rest_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#services_user':
+      return '<p>'. t('Provides user relationship methods to services applications. Requires services.module.') .'</p>';
+    case 'admin/modules#description':
+      return t('Provides user relationship methods to services applications. Requires services.module.');
+  }
+}
+
+/**
+ * Implementation of hook_services_resources().
+ */
+function user_relationship_rest_services_resources() {
+  return array(
+    'user-relationships' => array(
+      'index' => array(
+        'help' => 'Retrieves a listing of user relationships for the logged-in user.',
+        'file' => array('file' => 'inc', 'module' => 'user_relationship_rest'),
+        'callback' => 'user_relationship_rest_mine',
+        'access callback' => 'user_access',
+        'access arguments' => array('can have Friend relationships'),
+        'access arguments append' => FALSE,
+        'args' => array(
+        ),
+      ),
+      'delete' => array(
+        'help' => 'Delete an existing or pending relationship.',
+        'file' => array('file' => 'inc', 'module' => 'user_relationship_rest'),
+        'callback' => 'user_relationship_rest_delete',
+        'access callback' => 'user_access',
+        'access arguments' => array('delete Friend relationships'),
+        'access arguments append' => FALSE,
+        'args' => array(
+          array(
+            'name' => 'rid',
+            'type' => 'int',
+            'description' => 'Relationship ID to delete',
+            'source' => array(
+              'path' => '0',
+            ),
+            'optional' => FALSE,
+            'default value' => 0,
+          ),
+        ),
+      ),
+      'create' => array(
+        'help' => 'Request a user relationship.',
+        'file' => array('file' => 'inc', 'module' => 'user_relationship_rest'),
+        'callback' => 'user_relationship_rest_request',
+        'access callback' => 'user_access',
+        'access arguments' => array('can request Friend relationships'),
+        'access arguments append' => FALSE,
+        'args' => array(
+          array(
+            'name' => 'uid',
+            'type' => 'int',
+            'description' => 'ID of user from whom to request relationship.',
+            'source' => 'data',
+            'optional' => FALSE,
+          ),
+        ),
+      ),
+      'update' => array(
+        'help' => 'Approve a user relationship.',
+        'file' => array('file' => 'inc', 'module' => 'user_relationship_rest'),
+        'callback' => 'user_relationship_rest_approve',
+        'access callback' => 'user_access',
+        'access arguments' => array('maintain Friend relationships'),
+        'access arguments append' => FALSE,
+        'args' => array(
+          array(
+            'name' => 'rid',
+            'type' => 'int',
+            'description' => 'Relationship ID to accept.',
+            'source' => array(
+              'path' => '0',
+            ),
+            'optional' => FALSE,
+            'default value' => 0,
+          ),
+        ),
+      ),
+      'actions' => array(
+        'request-by-email' => array(
+          'help' => 'Request friend by providing email address.',
+          'file' => array('file' => 'inc', 'module' => 'user_relationship_rest'),
+          'access callback' => 'user_access',
+          'access arguments' => array('can request Friend relationships'),
+          'callback' => 'user_relationship_rest_request_by_email',
+          'args' => array(
+            array(
+              'name' => 'mail',
+              'type' => 'string',
+              'description' => '',
+              'source' => 'data',
+              'optional' => FALSE,
+              'default value' => '',
+            ),              
+          ),
+        ),
+        'is-logged-in' => array(
+          'help' => 'Determines whether user is logged in.',
+          'file' => array('file' => 'inc', 'module' => 'user_relationship_rest'),
+          'access callback' => 'user_access',
+          'access arguments' => array('access content'),
+          'callback' => 'user_relationship_rest_is_logged_in',
+          'args' => array(
+          ),
+        ),
+      ),
+    ),
+    'user-relationships-types' => array(
+      'index' => array(
+        'help' => 'Retrieves a listing of user relationship types.',
+        'file' => array('file' => 'inc', 'module' => 'user_relationship_rest'),
+        'callback' => 'user_relationship_rest_types',
+        'access callback' => 'user_access',
+        'access arguments' => array('can have Friend relationships'),
+        'access arguments append' => FALSE,
+        'args' => array(
+        ),
+      ),
+    ),
+  );
+}

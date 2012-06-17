@@ -1,0 +1,8 @@
+name = UR-REST
+description = Provides functions of User Relationships to Services module.
+package = "User Relationships"
+dependencies[] = services
+dependencies[] = user_relationships
+\version = "7.x-1.0"
+core = "7.x"
+project = "user_relationships"
