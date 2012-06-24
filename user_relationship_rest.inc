@@ -18,7 +18,6 @@ function user_relationship_rest_mine() {
     $param = array('user' => $user->uid);
     $options = array('include_user_info' => TRUE);
     $rels = user_relationships_load($param, $options);
-xdebug_break();
     if (!$rels || !is_array($rels)) {
       throw new Exception("User relationship load failed");
     }
@@ -27,8 +26,17 @@ xdebug_break();
         unset($rels[$rid]);
       }
       else {
-        $rel->requester = $rel->requester->name;
-        $rel->requestee = $rel->requestee->name;
+        $friend = new stdClass();
+        if ($rel->requester_id == $user->uid) {
+          $friend->id = $rel->requestee_id;
+          $friend->name = $rel->requestee->name;
+        }
+        else {
+          $friend->id = $rel->requester_id;
+          $friend->name = $rel->requester->name;
+        }
+        $friend->rid = $rid;
+        $rels[$rid] = $friend;
       }
     }
     return array_values($rels);
