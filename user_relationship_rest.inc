@@ -16,9 +16,20 @@ function user_relationship_rest_mine() {
   try {
     global $user;
     $param = array('user' => $user->uid);
-    $rels = user_relationships_load($param);
+    $options = array('include_user_info' => TRUE);
+    $rels = user_relationships_load($param, $options);
+xdebug_break();
     if (!$rels || !is_array($rels)) {
       throw new Exception("User relationship load failed");
+    }
+    foreach ($rels as $rid => $rel) {
+      if (!$rel->approved) {
+        unset($rels[$rid]);
+      }
+      else {
+        $rel->requester = $rel->requester->name;
+        $rel->requestee = $rel->requestee->name;
+      }
     }
     return array_values($rels);
   } catch (Exception $ex) {
