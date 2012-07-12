@@ -110,6 +110,23 @@ function user_relationship_rest_services_resources() {
             ),              
           ),
         ),
+        'password' => array(
+          'help' => 'Request a new password.',
+          'file' => array('file' => 'inc', 'module' => 'user_relationship_rest'),
+          'access callback' => 'user_access',
+          'access arguments' => array('access content'),
+          'callback' => 'user_relationship_rest_request_password',
+          'args' => array(
+            array(
+              'name' => 'name',
+              'type' => 'string',
+              'description' => '',
+              'source' => 'data',
+              'optional' => FALSE,
+              'default value' => '',
+            ),              
+          ),
+        ),
         'is-logged-in' => array(
           'help' => 'Determines whether user is logged in.',
           'file' => array('file' => 'inc', 'module' => 'user_relationship_rest'),

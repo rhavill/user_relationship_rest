@@ -1,10 +1,5 @@
 <?php
 /**
- * @file
- * Link general user relationship functionalities to services module.
- *
- * @author Drupal 6 port by Darren Ferguson <http://drupal.org/user/70179>
- * @author Written by scottgifford http://drupal.org/user/245699
  */
 
 
@@ -132,6 +127,33 @@ function user_relationship_rest_request_by_email($email) {
     return $ret;
   } catch (Exception $ex) {
     return services_error(t('Error requesting relationship by email: @msg', array('@msg' => $ex->getMessage())));
+  }
+}
+
+function user_relationship_rest_request_password($name) {
+  global $language;
+  try {
+    $query = db_select('users', 'u');
+    $uid = $query->fields('u', array('uid'))
+      ->condition(db_or()
+        ->condition('u.mail', $name)
+        ->condition('u.name', $name)
+      )
+      ->execute()
+      ->fetchField();
+    if (!$uid) {
+      return services_error(t('Could not find user with that code name or email.'), 404);
+    }    
+    $user = user_load($uid);
+    // Mail one time login URL and instructions using current language.
+    $mail = _user_mail_notify('password_reset', $user, $language);
+    if (!empty($mail)) {
+      watchdog('user', 'Password reset instructions mailed to %name at %email.', array('%name' => $account->name, '%email' => $account->mail));
+      return TRUE;
+    }
+    return FALSE;
+  } catch (Exception $ex) {
+    return services_error(t('Error trying to find user with code name or email @name: @msg', array('@name' => $name, '@msg' => $ex->getMessage())));
   }
 }
 
