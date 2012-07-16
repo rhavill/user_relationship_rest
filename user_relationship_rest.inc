@@ -141,20 +141,20 @@ function user_relationship_rest_request_password($name) {
       )
       ->execute()
       ->fetchField();
-    if (!$uid) {
-      return services_error(t('Could not find user with that code name or email.'), 404);
-    }    
-    $user = user_load($uid);
-    // Mail one time login URL and instructions using current language.
-    $mail = _user_mail_notify('password_reset', $user, $language);
-    if (!empty($mail)) {
-      watchdog('user', 'Password reset instructions mailed to %name at %email.', array('%name' => $account->name, '%email' => $account->mail));
-      return TRUE;
-    }
-    return FALSE;
   } catch (Exception $ex) {
-    return services_error(t('Error trying to find user with code name or email @name: @msg', array('@name' => $name, '@msg' => $ex->getMessage())));
+    return services_error(t('Database error trying to find user with code name or email @name: @msg', array('@name' => $name, '@msg' => $ex->getMessage())), 500);
   }
+  if (!$uid) {
+    return services_error(t('Could not find user with that code name or email.'), 404);
+  }    
+  $user = user_load($uid);
+  // Mail one time login URL and instructions using current language.
+  $mail = _user_mail_notify('password_reset', $user, $language);
+  if (!empty($mail)) {
+    watchdog('user', 'Password reset instructions mailed to %name at %email.', array('%name' => $account->name, '%email' => $account->mail));
+    return TRUE;
+  }
+  return services_error(t('Uncaught error during password request.'), 500);
 }
 
 function user_relationship_rest_is_logged_in() {
