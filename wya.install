@@ -1,0 +1,71 @@
+<?php 
+
+/**
+ * Implementation of hook_install().
+function wya_install() {
+  $success = TRUE;
+
+  if ($success) {
+    drupal_set_message(st('Veriplace module installed successfully.'));
+  }
+  else {
+    drupal_set_message(st('The installation of the Verpiplace module failed.'), 'error');
+  }
+}
+ */
+
+/**
+ * Implementation of hook_uninstall().
+function wya_uninstall() {
+  $query = db_select('variable', 'v', array('fetch' => PDO::FETCH_ASSOC));
+  $query->fields('v', array('name'));
+  $query->condition('name', db_like('wya') . '%', 'LIKE');
+  $vars = $query->execute();
+  foreach ($vars as $var) {
+    //variable_del($var['name']);
+  }
+  drupal_set_message(t('Veriplace module has been uninstalled.'));
+}
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function wya_schema() {
+  $schema = array();
+
+  $schema['wya_location'] = array(
+    'fields' => array(
+      'uid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'updated' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'latitude' => array(
+        'type' => 'float',
+        'size' => 'medium',
+        'not null' => TRUE,
+      ),
+      'longitude' => array(
+        'type' => 'float',
+        'size' => 'medium',
+        'not null' => TRUE,
+      ),
+      // accuracy in meters
+      'accuracy' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('uid'),
+    /*
+    'indexes' => array(
+      'wya_uid' => array('wya_uid'),
+    ),
+    */
+  );
+  return $schema;
+}
