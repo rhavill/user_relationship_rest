@@ -3,11 +3,11 @@
  */
 
 
-function user_relationship_rest_types() {
+function wya_types() {
   return user_relationships_types_load();
 }
 
-function user_relationship_rest_mine() {
+function wya_mine() {
   try {
     global $user;
     $param = array('user' => $user->uid);
@@ -40,7 +40,7 @@ function user_relationship_rest_mine() {
   }
 }
 
-function user_relationship_rest_approve($rid) {
+function wya_approve($rid) {
   try {
     global $user;
     $rels = user_relationships_load(array('rid' => $rid , 'requestee_id' => $user->uid, 'approved' => 0));
@@ -58,7 +58,7 @@ function user_relationship_rest_approve($rid) {
   }
 }
 
-function user_relationship_rest_delete($rid) {
+function wya_delete($rid) {
   try {
     global $user;
     $rels = user_relationships_load(array('rid' => $rid , 'user' => $user->uid));
@@ -76,7 +76,7 @@ function user_relationship_rest_delete($rid) {
   }
 }
 
-function user_relationship_rest_request($uid) {
+function wya_request($uid) {
   $type_name = 'Friend';
   try {
     $type = user_relationships_type_load(array('name' => $type_name));
@@ -99,7 +99,7 @@ function user_relationship_rest_request($uid) {
   }
 }
 
-function user_relationship_rest_request_by_email($email) {
+function wya_request_by_email($email) {
   $type_name = 'Friend';
   try {
     $type = user_relationships_type_load(array('name' => $type_name));
@@ -130,7 +130,7 @@ function user_relationship_rest_request_by_email($email) {
   }
 }
 
-function user_relationship_rest_request_password($name) {
+function wya_request_password($name) {
   global $language;
   try {
     $query = db_select('users', 'u');
@@ -157,7 +157,7 @@ function user_relationship_rest_request_password($name) {
   return services_error(t('Uncaught error during password request.'), 500);
 }
 
-function user_relationship_rest_is_logged_in() {
+function wya_is_logged_in() {
   $is_logged_in = FALSE;
   global $user;
   if ($user->uid) {

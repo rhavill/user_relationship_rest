@@ -1,0 +1,6 @@
+name = WYA
+description = Generic module for whereyouat.net.
+dependencies[] = services
+dependencies[] = user_relationships
+version = "7.x-1.0"
+core = "7.x"
