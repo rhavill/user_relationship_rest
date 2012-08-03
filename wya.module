@@ -24,6 +24,25 @@ function wya_help($path, $arg) {
  */
 function wya_services_resources() {
   return array(
+    'location' => array(
+      'create' => array(
+        'help' => 'Submit phone location..',
+        'file' => array('file' => 'inc', 'module' => 'wya'),
+        'callback' => 'wya_save_location',
+        'access callback' => 'user_access',
+        'access arguments' => array('submit location'),
+        'access arguments append' => FALSE,
+        'args' => array(
+          array(
+            'name' => 'location',
+            'type' => 'struct',
+            'description' => 'Location object.',
+            'source' => 'data',
+            'optional' => FALSE,
+          ),
+        ),
+      ),
+    ),
     'user-relationships' => array(
       'index' => array(
         'help' => 'Retrieves a listing of user relationships for the logged-in user.',

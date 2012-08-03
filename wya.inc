@@ -36,7 +36,7 @@ function wya_mine() {
     }
     return array_values($rels);
   } catch (Exception $ex) {
-    return services_error(t('Error getting user relationships: @msg', array('@msg' => $ex->getMessage())));
+    return services_error(t('Error getting user relationships.', array()));
   }
 }
 
@@ -54,7 +54,7 @@ function wya_approve($rid) {
     user_relationships_save_relationship($rel, 'approve');
     return $rel;
   } catch (Exception $ex) {
-    return services_error(t('Error approving relationship: @msg', array('@msg' => $ex->getMessage())));
+    return services_error(t('Error approving relationship', array()));
   }
 }
 
@@ -72,7 +72,7 @@ function wya_delete($rid) {
     user_relationships_delete_relationship($rel, $user, '');
     return $rel;
   } catch (Exception $ex) {
-    return services_error(t('Error removing relationship: @msg', array('@msg' => $ex->getMessage())));
+    return services_error(t('Error removing relationship.', array()));
   }
 }
 
@@ -95,7 +95,7 @@ function wya_request($uid) {
     }
     return $ret;
   } catch (Exception $ex) {
-    return services_error(t('Error requesting relationship: @msg', array('@msg' => $ex->getMessage())));
+    return services_error(t('Error requesting relationship.', array()));
   }
 }
 
@@ -126,7 +126,7 @@ function wya_request_by_email($email) {
     }
     return $ret;
   } catch (Exception $ex) {
-    return services_error(t('Error requesting relationship by email: @msg', array('@msg' => $ex->getMessage())));
+    return services_error(t('Error requesting relationship by email.', array()));
   }
 }
 
@@ -142,7 +142,7 @@ function wya_request_password($name) {
       ->execute()
       ->fetchField();
   } catch (Exception $ex) {
-    return services_error(t('Database error trying to find user with code name or email @name: @msg', array('@name' => $name, '@msg' => $ex->getMessage())), 500);
+    return services_error(t('Database error trying to find user with code name or email @name', array('@name' => $name)), 500);
   }
   if (!$uid) {
     return services_error(t('Could not find user with that code name or email.'), 404);
@@ -164,4 +164,43 @@ function wya_is_logged_in() {
     $is_logged_in = TRUE;
   }
   return $is_logged_in;
+}
+
+function wya_save_location($location) {
+  global $user;
+  if ($user->uid) {
+    try {
+      $query = db_select('wya_location', 'l');
+      $count = $query->condition('l.uid', $user->uid)
+        ->countQuery()
+        ->execute()
+        ->fetchField();
+      if ($count) {
+        $query = db_update('wya_location') ;
+          $rows_updated = $query->fields(array(
+            'latitude' => $location['latitude'],
+            'longitude' => $location['longitude'],
+            'accuracy' => $location['accuracy'],
+            'updated' => $location['updated'],
+          ))
+          ->condition('uid', $user->uid)
+          ->execute();        
+      }
+      else {
+        $query = db_insert('wya_location');
+        $query->fields(array(
+          'uid' => $user->uid,
+          'latitude' => $location['latitude'],
+          'longitude' => $location['longitude'],
+          'accuracy' => $location['accuracy'],
+          'updated' => $location['updated'],
+        ))
+        ->execute();
+      }
+    }
+    catch (Exception $ex) {
+      return services_error(t('Database error trying to save location for user %name', array('%name' => $user->name)), 500);
+    }
+  }
+  return TRUE;
 }

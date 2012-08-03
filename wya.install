@@ -45,13 +45,16 @@ function wya_schema() {
         'not null' => TRUE,
       ),
       'latitude' => array(
-        'type' => 'float',
-        'size' => 'medium',
+        'type' => 'numeric',
+        'precision' => 10,
+        'scale' => 7,
+        'not null' => TRUE,
         'not null' => TRUE,
       ),
       'longitude' => array(
-        'type' => 'float',
-        'size' => 'medium',
+        'type' => 'numeric',
+        'precision' => 10,
+        'scale' => 7,
         'not null' => TRUE,
       ),
       // accuracy in meters
