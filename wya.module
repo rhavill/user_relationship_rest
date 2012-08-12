@@ -25,12 +25,28 @@ function wya_help($path, $arg) {
 function wya_services_resources() {
   return array(
     'location' => array(
+      'retrieve' => array(
+        'file' => array('type' => 'inc', 'module' => 'wya'),
+        'callback' => 'wya_retrieve_location',
+        'args' => array(
+          array(
+            'name' => 'uid',
+            'optional' => FALSE,
+            'source' => array('path' => 0),
+            'type' => 'int',
+            'description' => 'The uid of the user location to get',
+          ),
+        ),
+        'access callback' => 'user_access',
+        'access arguments' => array('can have Friend relationships'),
+        'access arguments append' => FALSE,
+      ),
       'create' => array(
         'help' => 'Submit phone location..',
         'file' => array('file' => 'inc', 'module' => 'wya'),
         'callback' => 'wya_save_location',
         'access callback' => 'user_access',
-        'access arguments' => array('submit location'),
+        'access arguments' => array('can have Friend relationships'),
         'access arguments append' => FALSE,
         'args' => array(
           array(
@@ -39,6 +55,7 @@ function wya_services_resources() {
             'description' => 'Location object.',
             'source' => 'data',
             'optional' => FALSE,
+            'default value' => 0,
           ),
         ),
       ),

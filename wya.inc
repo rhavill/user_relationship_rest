@@ -166,6 +166,29 @@ function wya_is_logged_in() {
   return $is_logged_in;
 }
 
+function wya_retrieve_location($uid) {
+  global $user;
+  if (!$uid) {
+    $uid = $user->uid;
+  }
+  if ($uid) {
+    try {
+      $query = db_select('wya_location', 'l');
+      $row = $query->fields('l', array('latitude', 'longitude', 'accuracy', 'updated'))
+        ->condition('l.uid', $uid)
+        ->execute()
+        ->fetchObject();
+      if ($row) {
+        return $row;        
+      }
+    }
+    catch (Exception $ex) {
+      return services_error(t('Database error trying to find location for user @uid', array('@uid' => $uid)), 404);
+    }    
+  }
+  return FALSE;
+}
+
 function wya_save_location($location) {
   global $user;
   if ($user->uid) {
