@@ -8,6 +8,10 @@ function wya_types() {
 }
 
 function wya_mine() {
+  return wya_get_friends();
+}
+
+function wya_get_friends() {
   try {
     global $user;
     $param = array('user' => $user->uid);
@@ -35,11 +39,11 @@ function wya_mine() {
       }
     }
     return array_values($rels);
+    //return $rels;
   } catch (Exception $ex) {
     return services_error(t('Error getting user relationships.', array()));
-  }
+  }  
 }
-
 function wya_approve($rid) {
   try {
     global $user;
@@ -171,6 +175,18 @@ function wya_retrieve_location($uid) {
   if (!$uid) {
     $uid = $user->uid;
   }
+  elseif ($uid != $user->uid) {
+    $is_friend = FALSE;
+    $friends = wya_get_friends();
+    foreach ($friends as $friend) {
+      if ($uid == $friend->id) {
+        $is_friend = TRUE;
+      }
+    }
+    if (!$is_friend) {
+      return services_error(t('Database error trying to find location for user @uid', array('@uid' => $uid)), 403);
+    }
+  }
   if ($uid) {
     try {
       $query = db_select('wya_location', 'l');
@@ -183,7 +199,7 @@ function wya_retrieve_location($uid) {
       }
     }
     catch (Exception $ex) {
-      return services_error(t('Database error trying to find location for user @uid', array('@uid' => $uid)), 404);
+      return services_error(t('Database error trying to find location for user @uid', array('@uid' => $uid)), 500);
     }    
   }
   return FALSE;
