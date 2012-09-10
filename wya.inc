@@ -185,7 +185,7 @@ function wya_retrieve_location($uid) {
       }
     }
     if (!$is_friend) {
-      return services_error(t('Unable to get location for id @uid.', array('@uid' => $uid)), 403);
+      return services_error(t('Unable to get location for id @uid.', array('@uid' => $uid)), 404);
     }
   }
   if ($uid) {
@@ -203,7 +203,7 @@ function wya_retrieve_location($uid) {
       return services_error(t('Database error trying to find location for user @uid', array('@uid' => $uid)), 500);
     }    
   }
-  return FALSE;
+  return services_error(t('No location found for id @uid.', array('@uid' => $uid)), 404);
 }
 
 function wya_save_location($location) {
