@@ -129,15 +129,15 @@ function wya_services_resources() {
         ),
       ),
       'actions' => array(
-        'request-by-email' => array(
-          'help' => 'Request friend by providing email address.',
+        'request-by-name-email' => array(
+          'help' => 'Request friend by providing user name or email address.',
           'file' => array('file' => 'inc', 'module' => 'wya'),
           'access callback' => 'user_access',
           'access arguments' => array('can request Friend relationships'),
-          'callback' => 'wya_request_by_email',
+          'callback' => 'wya_request_by_name_email',
           'args' => array(
             array(
-              'name' => 'mail',
+              'name' => 'params',
               'type' => 'string',
               'description' => '',
               'source' => 'data',

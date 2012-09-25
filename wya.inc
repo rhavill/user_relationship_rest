@@ -18,7 +18,7 @@ function wya_get_friends() {
     $options = array('include_user_info' => TRUE);
     $rels = user_relationships_load($param, $options);
     if (!$rels || !is_array($rels)) {
-      throw new Exception("User relationship load failed");
+      return services_error("User relationship load failed.", 500);
     }
     foreach ($rels as $rid => $rel) {
       if (!$rel->approved) {
@@ -41,7 +41,7 @@ function wya_get_friends() {
     return array_values($rels);
     //return $rels;
   } catch (Exception $ex) {
-    return services_error(t('Error getting user relationships.', array()));
+    return services_error(t('Error getting user relationships.', array()), 500);
   }  
 }
 
@@ -59,7 +59,7 @@ function wya_approve($rid) {
     user_relationships_save_relationship($rel, 'approve');
     return $rel;
   } catch (Exception $ex) {
-    return services_error(t('Error approving relationship', array()));
+    return services_error(t('Error approving relationship', array()), 500);
   }
 }
 
@@ -77,7 +77,7 @@ function wya_delete($rid) {
     user_relationships_delete_relationship($rel, $user, '');
     return $rel;
   } catch (Exception $ex) {
-    return services_error(t('Error removing relationship.', array()));
+    return services_error(t('Error removing relationship.', array()), 500);
   }
 }
 
@@ -85,7 +85,7 @@ function wya_request($uid) {
   $type_name = 'Friend';
   try {
     $type = user_relationships_type_load(array('name' => $type_name));
-    error_log("Relationship request with '$uid' type '$type_name'");
+    //error_log("Relationship request with '$uid' type '$type_name'");
     if (!$type) {
       throw new Exception(t('No such relationship type'));
     }
@@ -100,38 +100,64 @@ function wya_request($uid) {
     }
     return $ret;
   } catch (Exception $ex) {
-    return services_error(t('Error requesting relationship.', array()));
+    return services_error(t('Error requesting relationship.', array()), 500);
   }
 }
 
-function wya_request_by_email($email) {
+function wya_request_by_name_email($params) {
   $type_name = 'Friend';
+  global $user;
+  $name = $params['name'];
+  // First determine if a friend request has already been made by one of the two parties.
+  try {
+    $param = array('user' => $user->uid);
+    $options = array('include_user_info' => TRUE);
+    $rels = user_relationships_load($param, $options);
+    if (!$rels || !is_array($rels)) {
+      return services_error("User relationship load failed.", 500);
+    }
+    foreach ($rels as $rid => $relationship) {
+      if ($relationship->requestee->name == $name || $relationship->requestee->mail == $name) {
+        // a request has already been made, so do nothing.
+        return $relationship->rid;
+      }
+      elseif ($relationship->requester->name == $name || $relationship->requester->mail == $name) {
+        // maybe we should automatically create friendship here 
+        return $relationship->rid;
+      }
+    }
+  }
+  catch (Exception $e) {
+    return services_error("Error getting existing friend requests.", 500);
+  }
   try {
     $type = user_relationships_type_load(array('name' => $type_name));
-    error_log("Relationship request with '$uid' type '$type_name'");
+    //error_log("Relationship request with '{$user->uid}' type '$type_name'");
     if (!$type) {
-      throw new Exception(t('No such relationship type'));
+      return services_error(t('No such relationship type.'), 500);
     }
     $query = db_select('users', 'u');
     $uid = $query->fields('u', array('uid'))
-      ->condition('u.mail', $email)
+      ->condition(db_or()
+        ->condition('u.name', $name)
+        ->condition('u.mail', $name)
+      )
       ->condition('u.uid', 0, '>')
       ->execute()
       ->fetchField();
     if (!$uid) {
-      return services_error(t('Could not find user with that email.'), 404);
+      return services_error(t('Could not find user with that name or email.'), 404);
     }    
-    global $user;
-    $ret = user_relationships_request_relationship($user, $uid, $type);
-    if (!$ret) {
+    $rel = user_relationships_request_relationship($user, $uid, $type);
+    if (!$rel) {
       throw new Exception(t('Unknown failure'));
     }
-    elseif (!is_object($ret)) {
-      throw new Exception($ret);
+    elseif (!is_object($rel)) {
+      throw new Exception($rel);
     }
-    return $ret;
+    return $rel->rid;
   } catch (Exception $ex) {
-    return services_error(t('Error requesting relationship by email.', array()));
+    return services_error(t('Error requesting relationship by email.', array()), 500);
   }
 }
 
