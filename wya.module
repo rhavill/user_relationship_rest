@@ -62,7 +62,7 @@ function wya_services_resources() {
     ),
     'user-relationships' => array(
       'index' => array(
-        'help' => 'Retrieves a listing of user relationships for the logged-in user.',
+        'help' => 'Retrieves a listing of friends for the logged-in user.',
         'file' => array('file' => 'inc', 'module' => 'wya'),
         'callback' => 'wya_mine',
         'access callback' => 'user_access',
@@ -169,6 +169,15 @@ function wya_services_resources() {
           'access callback' => 'user_access',
           'access arguments' => array('access content'),
           'callback' => 'wya_is_logged_in',
+          'args' => array(
+          ),
+        ),
+        'friend-requests' => array(
+          'help' => 'Friendship requests listing.',
+          'file' => array('file' => 'inc', 'module' => 'wya'),
+          'access callback' => 'user_access',
+          'access arguments' => array('can have Friend relationships'),
+          'callback' => 'wya_friend_requests',
           'args' => array(
           ),
         ),
