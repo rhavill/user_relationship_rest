@@ -111,7 +111,7 @@ function wya_delete($rid) {
       throw new Exception("Access denied");
     }
     user_relationships_delete_relationship($rel, $user, '');
-    return $rel;
+    return $rel->rid ? $rel->rid : 0;
   } catch (Exception $ex) {
     return services_error(t('Error removing relationship.', array()), 500);
   }
