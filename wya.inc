@@ -52,7 +52,7 @@ function wya_friend_requests() {
     $options = array('include_user_info' => TRUE);
     $requests = user_relationships_load($param, $options);
     if (!$requests || !is_array($requests)) {
-      return services_error("User relationship load failed.", 500);
+      return array();
     }
     foreach ($requests as $rid => $request) {
       if ($request->approved) {
@@ -75,7 +75,6 @@ function wya_friend_requests() {
       }
     }
     return array_values($requests);
-    //return $rels;
   } catch (Exception $ex) {
     return services_error(t('Error getting friend requests.', array()), 500);
   }  
