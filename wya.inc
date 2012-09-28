@@ -92,7 +92,7 @@ function wya_approve($rid) {
       throw new Exception("Access denied");
     }
     user_relationships_save_relationship($rel, 'approve');
-    return $rel;
+    return $rel->rid;
   } catch (Exception $ex) {
     return services_error(t('Error approving relationship', array()), 500);
   }
