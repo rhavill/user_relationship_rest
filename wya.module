@@ -146,6 +146,23 @@ function wya_services_resources() {
             ),              
           ),
         ),
+        'delete-by-uid' => array(
+          'help' => 'Delete friendship when given a uid.',
+          'file' => array('file' => 'inc', 'module' => 'wya'),
+          'access callback' => 'user_access',
+          'access arguments' => array('delete Friend relationships'),
+          'callback' => 'wya_delete_by_uid',
+          'args' => array(
+            array(
+              'name' => 'params',
+              'type' => 'string',
+              'description' => '',
+              'source' => 'data',
+              'optional' => FALSE,
+              'default value' => '',
+            ),              
+          ),
+        ),
         'password' => array(
           'help' => 'Request a new password.',
           'file' => array('file' => 'inc', 'module' => 'wya'),

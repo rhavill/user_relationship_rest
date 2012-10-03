@@ -116,6 +116,37 @@ function wya_delete($rid) {
   }
 }
 
+/*
+ * Delete a friendship when provided with the uid of one of the friends.
+ */
+function wya_delete_by_uid($params) {
+  global $user;
+  $friend_uid = $params['uid'];
+  try {
+    $type = user_relationships_type_load(array('name' => 'Friend'));
+    if (!$type) {
+      throw new Exception(t('No such relationship type'));
+    }
+    $rels = user_relationships_load(array('user' => $user->uid));
+    if (!$rels || !is_array($rels)) {
+      throw new Exception("User relationship load failed");
+    }
+    foreach ($rels as $rel) {
+      if (($rel->requestee_id == $user->uid && $rel->requester_id == $friend_uid) ||
+          ($rel->requester_id == $user->uid && $rel->requestee_id == $friend_uid)) {
+        user_relationships_delete_relationship($rel, $user, '');
+        return $rel->rid;
+      }
+    }
+    return services_error(t('Could not find relationship to delete.', array()), 404);
+  } catch (Exception $ex) {
+    // this catch captures the results of services_error calls above.
+    // Might want to return something more specific than a generic error.
+    return services_error(t('Error deleting relationship.', array()), 500);
+  }
+  
+}
+
 function wya_request($uid) {
   $type_name = 'Friend';
   try {
