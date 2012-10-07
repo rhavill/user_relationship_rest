@@ -209,7 +209,7 @@ function wya_request_by_name_email($params) {
       ->execute()
       ->fetchField();
     if (!$uid) {
-      return services_error(t('Could not find user with that name or email.'), 404);
+      return FALSE;
     }    
     $rel = user_relationships_request_relationship($user, $uid, $type);
     if (!$rel) {
