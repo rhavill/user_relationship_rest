@@ -179,9 +179,6 @@ function wya_request_by_name_email($params) {
     $param = array('user' => $user->uid);
     $options = array('include_user_info' => TRUE);
     $rels = user_relationships_load($param, $options);
-    if (!$rels || !is_array($rels)) {
-      return services_error("User relationship load failed.", 500);
-    }
     foreach ($rels as $rid => $relationship) {
       if ($relationship->requestee->name == $name || $relationship->requestee->mail == $name) {
         // a request has already been made, so do nothing.
