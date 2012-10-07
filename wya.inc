@@ -17,9 +17,6 @@ function wya_get_friends() {
     $param = array('user' => $user->uid);
     $options = array('include_user_info' => TRUE);
     $rels = user_relationships_load($param, $options);
-    if (!$rels || !is_array($rels)) {
-      return services_error("User relationship load failed.", 500);
-    }
     foreach ($rels as $rid => $rel) {
       if (!$rel->approved) {
         unset($rels[$rid]);
