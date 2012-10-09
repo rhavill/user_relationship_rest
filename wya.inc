@@ -80,13 +80,16 @@ function wya_friend_requests() {
 function wya_approve($rid) {
   try {
     global $user;
+    if (!$rid) {
+      return services_error(t('Could not approve relationship. Did not receive valid rid.'), array(), 400);
+    }
     $rels = user_relationships_load(array('rid' => $rid , 'requestee_id' => $user->uid, 'approved' => 0));
     if (!$rels || !is_array($rels) || count($rels) != 1) {
-      throw new Exception("User relationship load failed");
+      return services_error(t('Could not find relationship to approve.'), array(), 404);
     }
     $rel = array_shift($rels);
     if ($rel->requestee_id != $user->uid) {
-      throw new Exception("Access denied");
+      return services_error(t('Unauthorized attempt to approve relationship.'), array(), 401);
     }
     user_relationships_save_relationship($rel, 'approve');
     return $rel->rid;
@@ -95,16 +98,19 @@ function wya_approve($rid) {
   }
 }
 
-function wya_delete($rid) {
+function wya_delete($rid = 0) {
   try {
     global $user;
+    if (!$rid) {
+      return services_error(t('Could not delete relationship. Did not receive valid rid.'), array(), 400);
+    }
     $rels = user_relationships_load(array('rid' => $rid , 'user' => $user->uid));
     if (!$rels || !is_array($rels) || count($rels) != 1) {
-      throw new Exception("User relationship load failed");
+      return services_error(t('Could not find relationship to delete.'), array(), 404);
     }
     $rel = array_shift($rels);
     if ($rel->requestee_id != $user->uid && $rel->requester_id != $user->uid) {
-      throw new Exception("Access denied");
+      return services_error(t('Unauthorized attempt to delete relationship.'), array(), 401);
     }
     user_relationships_delete_relationship($rel, $user, '');
     return $rel->rid ? $rel->rid : 0;
