@@ -283,7 +283,9 @@ function wya_retrieve_location($uid) {
   if ($uid) {
     try {
       $query = db_select('wya_location', 'l');
+      $query->join('users', 'u', 'l.uid = u.uid');
       $row = $query->fields('l', array('latitude', 'longitude', 'accuracy', 'updated'))
+        ->fields('u', array('name'))
         ->condition('l.uid', $uid)
         ->execute()
         ->fetchObject();

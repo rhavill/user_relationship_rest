@@ -214,3 +214,14 @@ function wya_services_resources() {
     ),
   );
 }
+
+/**
+ *  Implementation of hook_views_api().
+ */
+function wya_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'wya'),
+  );
+}
+
